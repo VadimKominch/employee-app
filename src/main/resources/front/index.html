@@ -22,16 +22,33 @@
             </div>
 
         </div>
-    </nav>
-    <div class="main">
         <div class="buttons">
-            <button class="nav-btn create"><a href="add.html">Add new Employee</a></button>
+            <button class="nav-btn create">Add new Employee</button>
             <button class="nav-btn show">Show all</button>
         </div>
+    </nav>
+    <div class="main">
             <div class="container">
 
             </div>
     </div>
+    <div class="shadow">
+    <form class="add-employee">
+        <label for="firstName"><span>*</span>Имя:<input name = "firstName" type="text" class="input" required></label>
+        <label for="lastName"><span>*</span>Фамилия:<input name = "lastName" type="text" class="input" required></label>
+        <label for="jobTitle"><span>*</span>Должность:<input name = "jobTitle" type="text" class="input" required></label>
+        <label for="department_id"><span>*</span>Номер отдела:<!---->
+            <select name="department_id" id="" class="input" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+        </label>
+        <label for="dateOfBirth"><span>*</span>Дата рождения:<input name = "dateOfBirth" type="date" class="input" required></label>
+        <input type="submit" class="submit" value="Добавить">
+    </form>
+</div>
     <script src="script.js"></script>
 </body>
 </html>

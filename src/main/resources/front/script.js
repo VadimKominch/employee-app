@@ -3,11 +3,14 @@ const searchBox = document.querySelector(".search-input");
 const searchBlock = document.querySelector(".search-results");
 const addButton = document.getElementsByClassName("create")[0];
 const getAllButton = document.getElementsByClassName("show")[0];
+const shadow = document.getElementsByClassName("shadow")[0];
 
 async function loadAll() {
     const employees = await fetch("http://localhost:8080/simplewebapp/all");
     const jsonData = await employees.text();
     const employeeArray = await JSON.parse(jsonData);
+    console.log(employeeArray);
+    container.innerHTML = "";
     employeeArray.forEach(el => {
         container.appendChild(createEmployeeCard(el));
     });
@@ -49,33 +52,35 @@ function save(e) {
 function edit(e) {
     const card = e.target.parentNode;
     const body = {
-        'firstName':card.getElementsByClassName("first")[0],
-        'lastName' :card.getElementsByClassName("last")[0],
-        'jobTitle' :card.getElementsByClassName("job")[0],
-        'department':card.getElementsByClassName("department")[0],
-        'dateOfBirth':card.getElementsByClassName("date")[0]
+        "firstName":card.getElementsByClassName("first")[0].innerText,
+        "lastName" :card.getElementsByClassName("last")[0].innerText,
+        "jobTitle" :card.getElementsByClassName("job")[0].innerText,
+        "gender" :card.getElementsByClassName("gender")[0].innerText || "male",
+        "department":card.getElementsByClassName("department")[0].innerText,
+        "dateOfBirth":card.getElementsByClassName("date")[0].innerText
     };
-    const id = card.querySelector(".id").innerHTML;
+    const id = card.querySelector(".id").innerText;
+    console.log(body);
 //update request. close window after it ends up
-    /*fetch(`http://localhost:8080/simplewebapp/update/id/${id}`,{
+    fetch(`http://localhost:8080/simplewebapp/update/id/${id}`,{
                 method: "POST",    
                 headers: {
                     "Content-Type": "application/json"
                   },
                   body: JSON.stringify(body)
             })
-            .then(res=>console.log("updated"));*/
+            .then(res=>console.log("updated"));
 }
 
 function remove(e) {
     const card = e.target.parentNode;
     console.log(card);
-    const id = card.querySelector(".id").innerHTML; // get id of removed employee
-    /*fetch(`http://localhost:8080/simplewebapp/delete/id/${id}`,{
+    const id = card.querySelector(".id").innerText; // get id of removed employee
+    fetch(`http://localhost:8080/simplewebapp/delete/id/${id}`,{
                 method: "DELETE",    
                 headers: {},
             })
-            .then(res=>console.log("Removed"));*/
+            .then(res=>card.remove());
 }
 
 function createElement(elementName,classList) {
@@ -86,20 +91,7 @@ function createElement(elementName,classList) {
 }
 
 function additionForm() {
-    const div = createElement("div",["form"]);
-    for(let i = 0;i<5;i++) {
-        let el = createElement("input",["input"]);
-        el.type = "text";
-        div.appendChild(el);
-    }
-
-    
-    
-    const saveButton = createElement("input",["btn"]);
-    saveButton.value = "Save";
-    saveButton.addEventListener("click",save);
-    div.appendChild(saveButton);
-    document.body.appendChild(div);
+    shadow.style.visibility = "visible";
 }
 
 function createEmployeeCard(obj) {
@@ -107,7 +99,7 @@ function createEmployeeCard(obj) {
     const id = createElement("input");
     id.setAttribute("type", "hidden");
     id.classList.add("id"); 
-    id.innerHTML = obj["employee_id"];
+    id.innerHTML = obj["employeeId"];
     div.appendChild(id);
     const image = createElement("img",["img"]);
     image.src = "image.png"; // add png to folder
@@ -125,6 +117,11 @@ function createEmployeeCard(obj) {
     wrapper.appendChild(lastName);
     div.appendChild(wrapper);
     
+    const gender = createElement("h3",["gender"]);
+    gender.innerHTML = obj["gender"];
+    gender.contentEditable  = true;
+    div.appendChild(gender);
+
     const jobTitle = createElement("h3",["job"]);
     jobTitle.innerHTML = obj["jobTitle"];
     jobTitle.contentEditable  = true;
@@ -153,33 +150,34 @@ function createEmployeeCard(obj) {
     return div;
 }
 
-function createFoundElement(res) {
-    const div = createElement("div",["search-result"]);
-    if(res) {
-        div.innerHTML = res["firstName"];
-    } else {
-        div.innerHTML = "Not found";
-    }
-    return div;
-}
-
 function appendResult(res) {
-    const element = createFoundElement(res);
+    const element = createEmployeeCard(res);
     searchBlock.innerHTML = "";
-    searchBlock.appendChild(element);
+    container.innerHTML = element.outerHTML;
 }
 
 addButton.addEventListener("click",additionForm);
 searchBox.addEventListener("input",function(e) {
-    if(!e.target.value) return;
+    if(!e.target.value) {
+        loadAll();
+        return;
+    }
     const jsonData = getOne(e);
+    if(!jsonData) return;
     jsonData
     .then(res=>JSON.parse(res))
     .then(json=>{
         console.log(json);
         appendResult(json);
     }).catch(error=>{
-        appendResult();
+        container.innerHTML = "";
     });
 });
-getAllButton.addEventListener("click",loadAll)
+getAllButton.addEventListener("click",loadAll);
+shadow.addEventListener("click",(e)=>{
+    if(!e.target.classList.contains("add-employee")) {
+        shadow.style.visibility = "hidden";
+    }
+});
+
+document.addEventListener("DOMContentLoaded", loadAll);
