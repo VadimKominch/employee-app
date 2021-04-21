@@ -27,7 +27,7 @@ public class EmployeeControllerTest {
 
     @Test
     public void testOne() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/one/1")
+        mvc.perform(MockMvcRequestBuilders.get("/employees/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content()
