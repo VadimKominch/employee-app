@@ -21,7 +21,7 @@ public class EmployeeController {
 
     @ExceptionHandler({ NumberFormatException.class})
     public ResponseEntity<String> handleException() {
-        return new ResponseEntity<String>("Error",HttpStatus.OK);
+        return new ResponseEntity<String>("Error",HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(value = "/{id}")
@@ -47,7 +47,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(value = HttpStatus.GONE)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Long id) {
         service.delete(id);
     }
