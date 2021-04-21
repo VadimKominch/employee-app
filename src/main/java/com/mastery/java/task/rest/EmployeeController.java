@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping(value = "/employees")
 public class EmployeeController {
 
     @Autowired
@@ -23,28 +24,30 @@ public class EmployeeController {
         return new ResponseEntity<String>("Error",HttpStatus.OK);
     }
 
-    @GetMapping(value = "/one/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<?> getEmployee(@PathVariable String id) {
             return new ResponseEntity<Employee>(service.getEmployeeById(Long.parseLong(id)), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/all")
+    @GetMapping
     public ResponseEntity<?> getAllEmployee() {
         return new ResponseEntity<List<Employee>>(service.getAll(),HttpStatus.OK);
     }
 
-    @PostMapping(value="/add")
+    @PostMapping
+    @ResponseStatus(value = HttpStatus.CREATED)
     public void saveEmployee(@RequestBody Employee employee) {
-        System.out.println(employee.getGender().name());
         service.insert(employee);
+
     }
 
-    @PostMapping(value = "/update/id/{id}")
+    @PutMapping(value = "/{id}")
     public void updateEmployee(@RequestBody Employee employee,@PathVariable Long id) {
         service.update(employee,id);
     }
 
-    @DeleteMapping(value = "/delete/id/{id}")
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(value = HttpStatus.GONE)
     public void deleteEmployee(@PathVariable Long id) {
         service.delete(id);
     }
