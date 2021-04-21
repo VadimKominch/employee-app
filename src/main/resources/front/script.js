@@ -4,9 +4,11 @@ const searchBlock = document.querySelector(".search-results");
 const addButton = document.getElementsByClassName("create")[0];
 const getAllButton = document.getElementsByClassName("show")[0];
 const shadow = document.getElementsByClassName("shadow")[0];
+const form = document.getElementsByClassName("add-employee")[0];
+const saveButton = document.getElementsByClassName("submit")[0];
 
 async function loadAll() {
-    const employees = await fetch("http://localhost:8080/simplewebapp/all");
+    const employees = await fetch("http://localhost:8080/simplewebapp/employees/");
     const jsonData = await employees.text();
     const employeeArray = await JSON.parse(jsonData);
     console.log(employeeArray);
@@ -18,7 +20,7 @@ async function loadAll() {
 
 async function getOne(e) {
     const id = e.target.value;
-    const employee = await fetch(`http://localhost:8080/simplewebapp/one/${id}`);
+    const employee = await fetch(`http://localhost:8080/simplewebapp/employees/${id}`);
     const jsonData = await employee.text();
     if(!jsonData) {
        throw new Error();
@@ -28,6 +30,7 @@ async function getOne(e) {
 }
 
 function save(e) {
+    e.preventDefault();
     const card = e.target.parentNode;
     const body = {
         "firstName":card.getElementsByClassName("input")[0].value,
@@ -35,11 +38,11 @@ function save(e) {
         "jobTitle" :card.getElementsByClassName("input")[2].value,
         "department":card.getElementsByClassName("input")[3].value,
         "gender":"male",
-        "dateOfBirth":card.getElementsByClassName("input")[4].value
+        "dateOfBirth":"2000-04-18"/*card.getElementsByClassName("input")[4].value*/
     };
     console.log(JSON.stringify(body));
 //save request. close window after it ends up
-    fetch("http://localhost:8080/simplewebapp/add",{
+    fetch("http://localhost:8080/simplewebapp/employees",{
                 method: "POST",    
                 headers: {
                     "Content-Type": "application/json"
@@ -62,8 +65,8 @@ function edit(e) {
     const id = card.querySelector(".id").innerText;
     console.log(body);
 //update request. close window after it ends up
-    fetch(`http://localhost:8080/simplewebapp/update/id/${id}`,{
-                method: "POST",    
+    fetch(`http://localhost:8080/simplewebapp/employees/${id}`,{
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                   },
@@ -76,7 +79,7 @@ function remove(e) {
     const card = e.target.parentNode;
     console.log(card);
     const id = card.querySelector(".id").innerText; // get id of removed employee
-    fetch(`http://localhost:8080/simplewebapp/delete/id/${id}`,{
+    fetch(`http://localhost:8080/simplewebapp/employees/${id}`,{
                 method: "DELETE",    
                 headers: {},
             })
@@ -175,9 +178,15 @@ searchBox.addEventListener("input",function(e) {
 });
 getAllButton.addEventListener("click",loadAll);
 shadow.addEventListener("click",(e)=>{
+    console.log(e.target.classList.contains("add-employee"));
     if(!e.target.classList.contains("add-employee")) {
         shadow.style.visibility = "hidden";
     }
 });
+saveButton.addEventListener("click",e=> {
+    save(e);
+    shadow.style.visibility = "hidden";
+});
+form.addEventListener("click",(e)=>e.stopPropagation());
 
 document.addEventListener("DOMContentLoaded", loadAll);
