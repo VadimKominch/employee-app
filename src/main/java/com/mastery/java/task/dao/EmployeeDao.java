@@ -74,7 +74,7 @@ public class EmployeeDao {
 
 
     public Employee update(Long id, Employee newObj) {
-        template.update("update employee set first_name = ?,last_name = ?,job_title=?,gender = ?,date_of_birth = ?,department_id = ? where employee_id= ?", newObj.getFirstName(), newObj.getLastName(), newObj.getJobTitle(), newObj.getGender().name(), newObj.getDateOfBirth(),newObj.getDepartment(), id);
+        template.update("update employee set first_name = ?,last_name = ?,job_title=?,gender = ?,date_of_birth = ?,department_id = ? where employee_id= ?", newObj.getFirstName(), newObj.getLastName(), newObj.getJobTitle(), newObj.getGender().getValue(), newObj.getDateOfBirth(),newObj.getDepartment(), id);
         return newObj;
     }
 }
