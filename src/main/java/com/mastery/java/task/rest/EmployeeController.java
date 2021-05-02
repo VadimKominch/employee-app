@@ -25,30 +25,30 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getEmployee(@PathVariable String id) {
+    public ResponseEntity getEmployee(@PathVariable String id) {
             return new ResponseEntity<Employee>(service.getEmployeeById(Long.parseLong(id)), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllEmployee() {
+    public ResponseEntity getAllEmployee() {
         return new ResponseEntity<List<Employee>>(service.getAll(),HttpStatus.OK);
     }
 
     @PostMapping
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public void saveEmployee(@RequestBody Employee employee) {
+    public ResponseEntity saveEmployee(@RequestBody Employee employee) {
         service.insert(employee);
-
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}")
-    public void updateEmployee(@RequestBody Employee employee,@PathVariable Long id) {
+    public ResponseEntity updateEmployee(@RequestBody Employee employee,@PathVariable Long id) {
         service.update(employee,id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity deleteEmployee(@PathVariable Long id) {
         service.delete(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
