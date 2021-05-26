@@ -1,24 +1,32 @@
 package com.mastery.java.task.rest;
 
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.exception.UserNotFoundException;
 import com.mastery.java.task.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name="Employee Controller", description="implements CRUD operations with employee")
+@Validated
 @RestController
 @RequestMapping(value = "/employees")
 public class EmployeeController {
+
+    Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
     private EmployeeService service;
@@ -26,6 +34,7 @@ public class EmployeeController {
 
     @ExceptionHandler({ NumberFormatException.class})
     public ResponseEntity<String> handleException() {
+        logger.info("Handling exception");
         return new ResponseEntity<String>("Error",HttpStatus.BAD_REQUEST);
     }
 
@@ -35,7 +44,9 @@ public class EmployeeController {
             description = "Pass id to get employee from database"
     )
     @GetMapping(value = "/{id}")
-    public ResponseEntity getEmployee(@PathVariable Long id) {
+    public ResponseEntity getEmployee(@Valid @PathVariable Long id) throws UserNotFoundException {
+            logger.info("Getting employee by id");
+            logger.debug("debug by id");
             return new ResponseEntity<Employee>(service.getEmployeeById(id), HttpStatus.OK);
     }
 
@@ -55,7 +66,7 @@ public class EmployeeController {
             description = "Save employee in database(all fields must be non-null values)"
     )
     @PostMapping
-    public ResponseEntity saveEmployee(@RequestBody @Parameter(description = "Employee json body") Employee employee) {
+    public ResponseEntity saveEmployee(@Valid @RequestBody @Parameter(description = "Employee json body") Employee employee) {
         service.insert(employee);
         return new ResponseEntity(HttpStatus.CREATED);
     }
@@ -65,8 +76,8 @@ public class EmployeeController {
             description = "Delete employee from database"
     )
     @PutMapping(value = "/{id}")
-    public ResponseEntity updateEmployee(@RequestBody @Parameter(description = "Employee json body")Employee employee,
-                                         @PathVariable @Min(0) @Parameter(description = "Employee id") Long id) {
+    public ResponseEntity updateEmployee(@Valid @RequestBody @Parameter(description = "Employee json body")Employee employee,
+                                         @Valid @PathVariable @Parameter(description = "Employee id") Long id) {
         service.update(employee,id);
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -76,7 +87,7 @@ public class EmployeeController {
             description = "Delete employee from database"
     )
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity deleteEmployee(@Valid @PathVariable Long id) {
         service.delete(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

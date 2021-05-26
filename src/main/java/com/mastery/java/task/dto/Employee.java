@@ -2,18 +2,38 @@ package com.mastery.java.task.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.sun.istack.NotNull;
 
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import java.io.Serializable;
+import java.lang.annotation.Target;
 import java.util.Date;
 import java.util.Objects;
 
-public class Employee {
+@Entity
+@Table(name = "employee")
+public class Employee implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
+
+    @NotNull
     @JsonProperty("firstName")
     private String firstName;
+    @NotNull
     private String lastName;
+    @NotNull
     private String jobTitle;
+    @NotNull
+    @JsonProperty("gender")
+    @Enumerated(EnumType.STRING)
     private Gender gender;
+    @NotNull
     private Date dateOfBirth;
+    @NotNull
+    @Column(name="department_id")
     private Integer department;
 
     public Employee(Long employeeId, String firstName, String lastName, String jobTitle, Gender gender, Date dateOfBirth, Integer department) {
@@ -61,12 +81,12 @@ public class Employee {
         this.jobTitle = jobTitle;
     }
 
-    public Gender getGender() {
-        return gender;
+    public String getGender() {
+        return gender.getValue();
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
+    public void setGender(String value) {
+        this.gender = Gender.getGender(value);
     }
 
     public Date getDateOfBirth() {

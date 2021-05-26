@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  app:
+    image: 'simplewebapp:latest'
+    build:
+      context: .
+    container_name: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DATASOURCE_URL=jdbc:postgresql://db:5432/employeedb
+      - DATASOURCE_USERNAME=postgres
+      - DATASOURCE_PASSWORD=user
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=user
+      - POSTGRES_DB=employeedb

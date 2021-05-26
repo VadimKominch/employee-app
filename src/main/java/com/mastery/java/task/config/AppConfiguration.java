@@ -1,9 +1,18 @@
 package com.mastery.java.task.config;
 
+import com.mastery.java.task.dto.Employee;
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.*;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -11,29 +20,24 @@ import javax.sql.DataSource;
 
 
 @Configuration
-@ComponentScan(basePackages = "com.mastery.java.task")
+@EnableTransactionManagement
+@EnableJpaRepositories(basePackages = "com.mastery.java.task"
+)
 public class AppConfiguration {
 
     @Bean
-    @Profile("dev")
     @Primary
-    public DataSource getSource() {
-        DriverManagerDataSource builder = new DriverManagerDataSource();
-        builder.setDriverClassName("org.postgresql.Driver");
-        builder.setUrl("jdbc:postgresql://localhost:5432/employeedb");
-        builder.setUsername("postgres");
-        builder.setPassword("user");
-        return builder;
+    @ConfigurationProperties("app.datasource")
+    public DataSourceProperties getSourceProps() {
+        return new DataSourceProperties();
     }
 
     @Bean
-    @Profile("test")
-    public DataSource getTestSource() {
-        return new EmbeddedDatabaseBuilder()
-                .setType(EmbeddedDatabaseType.H2)
-                .setScriptEncoding("UTF-8")
-                .addScript("init-base.sql")
-                .build();
+    @Primary
+    @ConfigurationProperties("app.datasource.configuration")
+    public DataSource employeeDataSource() {
+        return getSourceProps().initializeDataSourceBuilder()
+                .type(HikariDataSource.class).build();
     }
 
     @Bean

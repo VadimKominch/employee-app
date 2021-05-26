@@ -2,6 +2,7 @@ package com.mastery.java.task.dao;
 
 
 import com.mastery.java.task.config.AppConfiguration;
+import com.mastery.java.task.config.TestConfiguration;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import org.junit.Assert;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {AppConfiguration.class})
+@ContextConfiguration(classes = {TestConfiguration.class})
 @PropertySource("classpath:application.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
@@ -35,41 +36,41 @@ public class EmployeeDaoTest {
 	
 	@Test
 	public void checkIfGetFirstEntityFromDbNotNull() {
-		Employee employee = employeeDao.getById(first);
+		Employee employee = employeeDao.findById(first).get();
         Assert.assertNotNull(employee);
 	}
 	
 	@Test(expected = EmptyResultDataAccessException.class)
 	public void checkIfGetInvalidIdEntityFromDbGetException() {
-		Employee employee = employeeDao.getById(invalidId);
+		Employee employee = employeeDao.findById(invalidId).get();
 	}
 	
 	@Test
 	public void checkIfAllRecordsFromDbWillBeRecieved() {
-		List<Employee> employees = employeeDao.getAll();
-		Assert.assertEquals(3,employeeDao.getAll().size());
+		List<Employee> employees = (List<Employee>) employeeDao.findAll();
+		Assert.assertEquals(3,employees.size());
 	}
 	@Test
 	public void checkIfNewEmployeeWillBeInserted() {
-		int oldCapacity = employeeDao.getAll().size();
+		int oldCapacity = ((List<Employee>) employeeDao.findAll()).size();
 		Employee newEmployee = new Employee(0L,"Sasha","Kominch","engineer", Gender.MALE,new java.sql.Date(new Date().getTime()),2);
 		employeeDao.save(newEmployee);
-		Assert.assertEquals(oldCapacity+1,employeeDao.getAll().size());
+		Assert.assertEquals(oldCapacity+1,((List<Employee>) employeeDao.findAll()).size());
 	}
 	
 	@Test(expected = NullPointerException.class)
 	public void checkIfNullWillNotBeInserted() {
-		int oldCapacity = employeeDao.getAll().size();
+		int oldCapacity = ((List<Employee>) employeeDao.findAll()).size();
 		employeeDao.save(null); //raise SQLException for null data
 	}
 	
 	@Test
 	public void checkIfChangeSomeFieldsInExistingEntityWillBeRepresentedInDb() {
-		Employee employee = employeeDao.getById(first);
+		Employee employee = employeeDao.findById(first).get();
 		String actual = employee.getFirstName();
 		employee.setFirstName("Undefined");
-		employeeDao.update(first,employee);
-		Employee newEmployee = employeeDao.getById(first);
+		employeeDao.save(employee);
+		Employee newEmployee = employeeDao.findById(first).get();
 		System.out.println(employee.getFirstName());
 		System.out.println(newEmployee.getFirstName());
 		Assert.assertNotEquals(actual,newEmployee.getFirstName());
@@ -77,14 +78,14 @@ public class EmployeeDaoTest {
 
 	@Test(expected = EmptyResultDataAccessException.class)
     public void checkIfExisitingItemWillBeDeleted() {
-        employeeDao.delete(idToDelete);
-        employeeDao.getById(idToDelete);
+        employeeDao.deleteById(idToDelete);
+        employeeDao.findById(idToDelete).get();
     }
 
     @Test
     public void checkIfNonExistingItemWillNotChangeBase() {
-	    int prevCapacity = employeeDao.getAll().size();
-        employeeDao.delete(invalidId);
-        Assert.assertEquals(prevCapacity,employeeDao.getAll().size());
+	    int prevCapacity = ((List<Employee>) employeeDao.findAll()).size();
+        employeeDao.deleteById(invalidId);
+        Assert.assertEquals(prevCapacity,((List<Employee>) employeeDao.findAll()).size());
     }
 }

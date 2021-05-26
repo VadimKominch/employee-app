@@ -2,8 +2,10 @@ package com.mastery.java.task.service;
 
 
 import com.mastery.java.task.config.AppConfiguration;
+import com.mastery.java.task.config.TestConfiguration;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
+import com.mastery.java.task.exception.UserNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {AppConfiguration.class})
+@ContextConfiguration(classes = {TestConfiguration.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 public class EmployeeServiceTest {
@@ -38,13 +40,13 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void checkIfNotExistingIdWillReturnNull() {
+    public void checkIfNotExistingIdWillReturnNull() throws UserNotFoundException {
         Employee employee = employeeService.getEmployeeById(Long.MAX_VALUE-1);
         Assert.assertNull(employee);
     }
 
     @Test
-    public void checkIfGetFirstEntityFromDbNotNull() {
+    public void checkIfGetFirstEntityFromDbNotNull() throws UserNotFoundException {
         Employee employee = employeeService.getEmployeeById(first);
         Assert.assertNotNull(employee);
     }
@@ -66,7 +68,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void checkIfChangeSomeFieldsInExistingEntityWillBeRepresentedInDb() {
+    public void checkIfChangeSomeFieldsInExistingEntityWillBeRepresentedInDb() throws UserNotFoundException {
         Employee employee = employeeService.getEmployeeById(first);
         String actual = employee.getFirstName();
         employee.setFirstName("Undefined");
@@ -78,7 +80,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void checkIfExisitingItemWillBeDeleted() {
+    public void checkIfExisitingItemWillBeDeleted() throws UserNotFoundException {
         employeeService.delete(idToDelete);
         Assert.assertNull(employeeService.getEmployeeById(idToDelete));
     }

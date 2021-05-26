@@ -2,46 +2,45 @@ package com.mastery.java.task.service;
 
 import com.mastery.java.task.dao.EmployeeDao;
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.exception.UserNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.List;
-
-@Component
+@Validated
+@Service
 public class EmployeeService {
 
-
+    @Autowired
     private EmployeeDao employeeDao;
 
-    public EmployeeService(EmployeeDao employeeDao) {
-        this.employeeDao = employeeDao;
-    }
-
-    public Employee getEmployeeById(Long id) {
-        try {
-            return employeeDao.getById(id);
-        } catch(EmptyResultDataAccessException e) {
-            return null;
-        }
+    public Employee getEmployeeById(Long id) throws UserNotFoundException {
+            Employee emp =  employeeDao.findById(id).orElse(null);
+            if(emp == null) {
+                throw new UserNotFoundException("User not found");
+            }
+            return emp;
     }
 
     public List<Employee> getAll() {
-        return employeeDao.getAll();
+        return (List<Employee>) employeeDao.findAll();
     }
 
-    public void insert(Employee employee) {
-        if(employee != null)
+    public void insert(@Valid Employee employee) {
+        employeeDao.save(employee);
+    }
+
+    public void delete(@Valid Long id) {
+
+        employeeDao.deleteById(id);
+    }
+
+    public void update(@Valid Employee employee,@Valid Long id) {
+            employee.setEmployeeId(id);
             employeeDao.save(employee);
-    }
-
-    public void delete(Long id) {
-
-        employeeDao.delete(id);
-    }
-
-    public void update(Employee employee,Long id) {
-        if(employee != null)
-            employeeDao.update(id,employee);
     }
 }

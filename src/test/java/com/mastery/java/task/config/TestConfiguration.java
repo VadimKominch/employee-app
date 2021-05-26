@@ -12,19 +12,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan(basePackages = "com.mastery.java.task")
-public class AppConfiguration {
-
-    @Bean
-    @Profile("dev")
-    @Primary
-    public DataSource getSource() {
-        DriverManagerDataSource builder = new DriverManagerDataSource();
-        builder.setDriverClassName("org.postgresql.Driver");
-        builder.setUrl("jdbc:postgresql://localhost:5432/employeedb");
-        builder.setUsername("postgres");
-        builder.setPassword("user");
-        return builder;
-    }
+public class TestConfiguration {
 
     @Bean
     @Profile("test")
@@ -34,17 +22,5 @@ public class AppConfiguration {
                 .setScriptEncoding("UTF-8")
                 .addScript("init-base.sql")
                 .build();
-    }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS");
-            }
-        };
     }
 }

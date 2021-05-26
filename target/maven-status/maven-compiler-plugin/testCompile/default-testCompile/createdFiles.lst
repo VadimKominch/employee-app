@@ -1,0 +1,4 @@
+com\mastery\java\task\config\TestConfiguration.class
+com\mastery\java\task\dao\EmployeeDaoTest.class
+com\mastery\java\task\rest\EmployeeControllerTest.class
+com\mastery\java\task\service\EmployeeServiceTest.class
