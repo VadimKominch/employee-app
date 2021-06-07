@@ -6,6 +6,8 @@ import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.lang.annotation.Target;
 import java.util.Date;
@@ -20,20 +22,25 @@ public class Employee implements Serializable {
     private Long employeeId;
 
     @NotNull
-    @JsonProperty("firstName")
+    @JsonProperty(value = "firstName",required = true)
     private String firstName;
     @NotNull
+    @JsonProperty(required = true)
     private String lastName;
     @NotNull
+    @JsonProperty(required = true)
     private String jobTitle;
     @NotNull
-    @JsonProperty("gender")
+    @JsonProperty(value = "gender",required = true)
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    @NotNull
+    @NotBlank
+    @JsonProperty(required = true)
     private Date dateOfBirth;
-    @NotNull
+
     @Column(name="department_id")
+    @NotBlank
+    @JsonProperty(required = true)
     private Integer department;
 
     public Employee(Long employeeId, String firstName, String lastName, String jobTitle, Gender gender, Date dateOfBirth, Integer department) {
@@ -122,5 +129,18 @@ public class Employee implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(employeeId, firstName, lastName, jobTitle, gender, dateOfBirth, department);
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "employeeId=" + employeeId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", jobTitle='" + jobTitle + '\'' +
+                ", gender=" + gender +
+                ", dateOfBirth=" + dateOfBirth +
+                ", department=" + department +
+                '}';
     }
 }

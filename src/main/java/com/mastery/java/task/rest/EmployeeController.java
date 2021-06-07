@@ -1,12 +1,13 @@
 package com.mastery.java.task.rest;
 
 import com.mastery.java.task.dto.Employee;
-import com.mastery.java.task.exception.UserNotFoundException;
+import com.mastery.java.task.exception.EmployeeNotFoundException;
 import com.mastery.java.task.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name="Employee Controller", description="implements CRUD operations with employee")
@@ -31,23 +30,18 @@ public class EmployeeController {
     @Autowired
     private EmployeeService service;
 
-
-    @ExceptionHandler({ NumberFormatException.class})
-    public ResponseEntity<String> handleException() {
-        logger.info("Handling exception");
-        return new ResponseEntity<String>("Error",HttpStatus.BAD_REQUEST);
-    }
-
-
     @Operation(
             summary = "Get employee by id",
             description = "Pass id to get employee from database"
     )
     @GetMapping(value = "/{id}")
-    public ResponseEntity getEmployee(@Valid @PathVariable Long id) throws UserNotFoundException {
-            logger.info("Getting employee by id");
-            logger.debug("debug by id");
-            return new ResponseEntity<Employee>(service.getEmployeeById(id), HttpStatus.OK);
+    @ApiResponses(value = {@ApiResponse(responseCode="200",description = "return Employee with passed id"),
+            @ApiResponse(responseCode="404",description = "return error message ")})
+    public ResponseEntity getEmployee(@PathVariable @Parameter(description = "Employee id") Long id) throws EmployeeNotFoundException {
+            logger.info("Getting employee by id {}",id);
+            Employee employee = service.getEmployeeById(id);
+            logger.debug("Request for employee {}",employee);
+            return new ResponseEntity<Employee>(employee, HttpStatus.OK);
     }
 
 
@@ -57,6 +51,7 @@ public class EmployeeController {
     )
     @GetMapping
     public ResponseEntity getAllEmployee() {
+        logger.info("List of employees got");
         return new ResponseEntity<List<Employee>>(service.getAll(),HttpStatus.OK);
     }
 
@@ -66,8 +61,9 @@ public class EmployeeController {
             description = "Save employee in database(all fields must be non-null values)"
     )
     @PostMapping
-    public ResponseEntity saveEmployee(@Valid @RequestBody @Parameter(description = "Employee json body") Employee employee) {
+    public ResponseEntity saveEmployee(@RequestBody @Parameter(description = "Employee json body") Employee employee) {
         service.insert(employee);
+        logger.info("Employee {} saved",employee);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
@@ -76,19 +72,23 @@ public class EmployeeController {
             description = "Delete employee from database"
     )
     @PutMapping(value = "/{id}")
+    @ApiResponse(responseCode="200",description = "update employee with correctly passed id")
     public ResponseEntity updateEmployee(@Valid @RequestBody @Parameter(description = "Employee json body")Employee employee,
-                                         @Valid @PathVariable @Parameter(description = "Employee id") Long id) {
+                                         @PathVariable @Parameter(description = "Employee id") Long id) throws EmployeeNotFoundException {
         service.update(employee,id);
+        logger.info("Employee with id {} updated. New employee is {}",id,employee);
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @Operation(
-            summary = "Update employee",
+            summary = "Delete employee",
             description = "Delete employee from database"
     )
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity deleteEmployee(@Valid @PathVariable Long id) {
+    @ApiResponse(responseCode="204",description = "delete employee with correctly passed id")
+    public ResponseEntity deleteEmployee( @PathVariable @Parameter(description = "Employee id") Long id) throws EmployeeNotFoundException {
         service.delete(id);
+        logger.info("Employee with id {} deleted",id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

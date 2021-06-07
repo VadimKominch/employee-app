@@ -12,10 +12,7 @@ import java.util.Date;
 @SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(Main.class,args);
-        JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
-        System.out.println("Sending an email message.");
-        jmsTemplate.convertAndSend("mailbox", new Employee(0L,"Sasha","Kominch","engineer", Gender.MALE,new java.sql.Date(new Date().getTime()),2));
+        SpringApplication.run(Main.class,args);
     }
 }
 

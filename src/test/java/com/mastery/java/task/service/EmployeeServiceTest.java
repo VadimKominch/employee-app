@@ -1,17 +1,14 @@
 package com.mastery.java.task.service;
 
 
-import com.mastery.java.task.config.AppConfiguration;
 import com.mastery.java.task.config.TestConfiguration;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
-import com.mastery.java.task.exception.UserNotFoundException;
+import com.mastery.java.task.exception.EmployeeNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,13 +37,13 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void checkIfNotExistingIdWillReturnNull() throws UserNotFoundException {
+    public void checkIfNotExistingIdWillReturnNull() throws EmployeeNotFoundException {
         Employee employee = employeeService.getEmployeeById(Long.MAX_VALUE-1);
         Assert.assertNull(employee);
     }
 
     @Test
-    public void checkIfGetFirstEntityFromDbNotNull() throws UserNotFoundException {
+    public void checkIfGetFirstEntityFromDbNotNull() throws EmployeeNotFoundException {
         Employee employee = employeeService.getEmployeeById(first);
         Assert.assertNotNull(employee);
     }
@@ -68,7 +65,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void checkIfChangeSomeFieldsInExistingEntityWillBeRepresentedInDb() throws UserNotFoundException {
+    public void checkIfChangeSomeFieldsInExistingEntityWillBeRepresentedInDb() throws EmployeeNotFoundException {
         Employee employee = employeeService.getEmployeeById(first);
         String actual = employee.getFirstName();
         employee.setFirstName("Undefined");
@@ -80,13 +77,13 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void checkIfExisitingItemWillBeDeleted() throws UserNotFoundException {
+    public void checkIfExisitingItemWillBeDeleted() throws EmployeeNotFoundException {
         employeeService.delete(idToDelete);
         Assert.assertNull(employeeService.getEmployeeById(idToDelete));
     }
 
     @Test
-    public void checkIfNonExistingItemWillNotChangeBase() {
+    public void checkIfNonExistingItemWillNotChangeBase() throws EmployeeNotFoundException {
         int prevCapacity = employeeService.getAll().size();
         employeeService.delete(invalidId);
         Assert.assertEquals(prevCapacity,employeeService.getAll().size());
