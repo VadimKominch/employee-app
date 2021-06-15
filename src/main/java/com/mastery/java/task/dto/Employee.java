@@ -34,12 +34,12 @@ public class Employee implements Serializable {
     @JsonProperty(value = "gender",required = true)
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    @NotBlank
+    @NotNull
     @JsonProperty(required = true)
     private Date dateOfBirth;
 
     @Column(name="department_id")
-    @NotBlank
+    @NotNull
     @JsonProperty(required = true)
     private Integer department;
 

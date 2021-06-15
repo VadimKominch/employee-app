@@ -2,6 +2,7 @@ package com.mastery.java.task.rest;
 
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.jms.JmsProducer;
+import com.mastery.java.task.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,8 +26,14 @@ import javax.validation.Valid;
 public class AsyncEmployeeController {
     Logger logger = LoggerFactory.getLogger(AsyncEmployeeController.class);
 
-    @Autowired
     private JmsProducer jmsProducer;
+    private EmployeeService employeeService;
+
+    @Autowired
+    public AsyncEmployeeController(JmsProducer jmsProducer, EmployeeService employeeService) {
+        this.jmsProducer = jmsProducer;
+        this.employeeService = employeeService;
+    }
 
     @Operation(
             summary = "Pass employee to active mq queue",
@@ -37,6 +44,7 @@ public class AsyncEmployeeController {
     public ResponseEntity<String> postEmployeeToQueue(@Valid @Parameter(description = "Employee json body") @RequestBody Employee employee) {
         logger.info("{} is sent to active mq queue",employee);
         jmsProducer.sendMessage(employee);
+        employeeService.insert(employee);
         return new ResponseEntity<String>("OK", HttpStatus.OK);
     }
 }
