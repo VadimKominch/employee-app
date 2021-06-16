@@ -14,17 +14,15 @@ import javax.jms.Destination;
 @Component
 public class JmsProducer {
 
-    private Destination destination;
     private JmsTemplate jmsTemplate;
 
 
-    public JmsProducer(Destination destination, JmsTemplate jmsTemplate) {
-        this.destination = destination;
+    public JmsProducer(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
     }
 
     public void sendMessage(Employee employee) {
-        jmsTemplate.convertAndSend(destination, employee);
+        jmsTemplate.convertAndSend(employee);
     }
 
 }

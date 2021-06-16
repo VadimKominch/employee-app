@@ -27,12 +27,10 @@ public class AsyncEmployeeController {
     Logger logger = LoggerFactory.getLogger(AsyncEmployeeController.class);
 
     private JmsProducer jmsProducer;
-    private EmployeeService employeeService;
 
     @Autowired
-    public AsyncEmployeeController(JmsProducer jmsProducer, EmployeeService employeeService) {
+    public AsyncEmployeeController(JmsProducer jmsProducer) {
         this.jmsProducer = jmsProducer;
-        this.employeeService = employeeService;
     }
 
     @Operation(
@@ -44,7 +42,6 @@ public class AsyncEmployeeController {
     public ResponseEntity<String> postEmployeeToQueue(@Valid @Parameter(description = "Employee json body") @RequestBody Employee employee) {
         logger.info("{} is sent to active mq queue",employee);
         jmsProducer.sendMessage(employee);
-        employeeService.insert(employee);
         return new ResponseEntity<String>("OK", HttpStatus.OK);
     }
 }
