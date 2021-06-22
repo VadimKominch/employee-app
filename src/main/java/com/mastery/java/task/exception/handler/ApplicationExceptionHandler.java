@@ -22,12 +22,12 @@ public class ApplicationExceptionHandler {
         return new ResponseEntity<String>(String.format("User with id %d doesn't exist",e.getId()), HttpStatus.NOT_FOUND);
     }
 
-    /*@ExceptionHandler(Exception.class)
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleOtherExceptions(Exception e) {
         EmployeeServiceException ex = new EmployeeServiceException(e);
         logger.error("Exception  {}",ex.toString());
         return new ResponseEntity<String>("Exception", HttpStatus.BAD_REQUEST);
-    }*/
+    }
 
 
 
